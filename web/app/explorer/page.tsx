@@ -18,6 +18,11 @@ export default function ExplorerPage() {
   const { data: blocks, isLoading, error, refetch } = useLatestBlocks(20, {
     enabled: isClient,
   })
+
+  // Fetch more blocks for Top Parallel tab to find high scorers
+  const { data: allBlocks } = useLatestBlocks(120, {
+    enabled: isClient && tab === 'top',
+  })
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<'live' | 'top'>('live')
   const router = useRouter()
@@ -38,11 +43,12 @@ export default function ExplorerPage() {
   )
 
   const topBlocks = useMemo(() => {
-    if (!blocks) return null
-    return [...blocks]
+    const source = allBlocks ?? blocks
+    if (!source) return null
+    return [...source]
       .sort((a, b) => computeParallelScore(b).total - computeParallelScore(a).total)
       .slice(0, 12)
-  }, [blocks])
+  }, [allBlocks, blocks])
 
   const displayBlocks = (tab === 'top' && topBlocks ? topBlocks : blocks) ?? []
 
@@ -113,11 +119,13 @@ export default function ExplorerPage() {
                 {tab === 'top' && topBlocks && (
                   <div className="ml-auto flex items-center gap-4">
                     <span className="text-xs text-zinc-500 font-mono">
-                      Showing top {topBlocks.length} of {blocks.length} blocks
+                      Top {topBlocks.length} of {allBlocks?.length ?? blocks.length} blocks scanned
                     </span>
-                    <span className="text-xs text-zinc-600 font-mono">
-                      Last 100 blocks analyzed
-                    </span>
+                    {allBlocks && (
+                      <span className="text-xs text-orange-400 font-mono">
+                        Highest: {computeParallelScore(topBlocks[0]).total}%
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
