@@ -2,7 +2,7 @@
 
 **Built for Monad** — See what standard explorers can't: how Monad executes transactions in parallel.
 
-> 🎥 **Watch Demo**: [Click here to watch the demo video](https://www.canva.com/design/DAHJ1fgNWeY/LfLk5Hg-bQKxreQBhNj06g/edit?ui=e30)
+> 🎥 **Watch Demo**: [Canva Presentation](https://www.canva.com/design/DAHJ1fgNWeY/LfLk5Hg-bQKxreQBhNj06g/edit?ui=e30) | 🌐 **Live Site**: [paral-lens.vercel.app](https://paral-lens.vercel.app)
 
 ParaLens is a **block explorer + performance dashboard** that visualizes Monad blockchain's core feature: **Optimistic Parallel Execution**. While standard explorers show raw block data, ParaLens answers: _"How many transactions in this block actually ran in parallel?"_
 
