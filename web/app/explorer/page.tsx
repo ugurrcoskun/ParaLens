@@ -44,7 +44,7 @@ export default function ExplorerPage() {
       .slice(0, 12)
   }, [blocks])
 
-  const displayBlocks = tab === 'top' && topBlocks ? topBlocks : blocks
+  const displayBlocks = (tab === 'top' && topBlocks ? topBlocks : blocks) ?? []
 
   return (
     <div className="min-h-screen">
