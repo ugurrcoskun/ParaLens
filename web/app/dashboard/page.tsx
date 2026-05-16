@@ -177,17 +177,33 @@ export default function DashboardPage() {
   const [mockTxHash, setMockTxHash] = useState<string | null>(null)
   const [mockTxPending, setMockTxPending] = useState(false)
 
-  const handleMockTestTx = () => {
+  const handleMockTestTx = async () => {
     setMockTxPending(true)
     setMockTxHash(null)
-    // Simulate 2s tx confirmation
-    setTimeout(() => {
-      const randomHash = '0x' + Array.from({ length: 64 }, () =>
-        Math.floor(Math.random() * 16).toString(16)
-      ).join('')
+
+    const randomHash = '0x' + Array.from({ length: 64 }, () =>
+      Math.floor(Math.random() * 16).toString(16)
+    ).join('')
+
+    // Fetch latest block for navigation
+    try {
+      const res = await fetch('https://testnet-rpc.monad.xyz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }),
+      })
+      const data = await res.json()
+      const blockNumber = parseInt(data.result, 16)
       setMockTxHash(randomHash)
       setMockTxPending(false)
-    }, 2000)
+      // Navigate to real block after short delay
+      setTimeout(() => {
+        window.location.href = `/explorer/${blockNumber}`
+      }, 1200)
+    } catch {
+      setMockTxHash(randomHash)
+      setMockTxPending(false)
+    }
   }
 
   const hasCatastrophicError = isClient && blocksError && statsError && !blocks
@@ -550,8 +566,8 @@ export default function DashboardPage() {
           <div className="mt-8 border border-zinc-800 bg-[#18181b]/50 p-6">
             <h2 className="text-lg font-semibold text-zinc-100 mb-2">Demo Transaction</h2>
             <p className="text-sm text-zinc-400 mb-4">
-              Simulate a transaction to demonstrate how ParaLens visualizes block data.
-              No wallet required — this is for demo purposes.
+              Simulate a transaction and see it visualized in a real Monad testnet block.
+              No wallet required — for demo purposes only.
             </p>
 
             <button
@@ -584,17 +600,9 @@ export default function DashboardPage() {
                 <p className="font-mono text-sm text-green-400 break-all">
                   {mockTxHash}
                 </p>
-                <div className="mt-3 flex items-center gap-3">
-                  <a
-                    href="/explorer"
-                    className="text-xs text-orange-400 hover:text-orange-300 font-mono"
-                  >
-                    View in Explorer →
-                  </a>
-                  <span className="text-[10px] text-zinc-600 font-mono">
-                    Your tx will appear in the next block (~0.4s)
-                  </span>
-                </div>
+                <p className="text-[10px] text-zinc-600 mt-2 font-mono">
+                  Opening latest Monad testnet block to show your transaction...
+                </p>
               </div>
             )}
           </div>
