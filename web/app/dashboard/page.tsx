@@ -175,8 +175,18 @@ export default function DashboardPage() {
 
   const cx = 150, cy = 150, r = 110
 
-  const { sendTransaction, data: txData, isPending: txPending, error: txError } = useSendTransaction()
+  const { sendTransaction, data: txData, isPending: txPending, error: txError, reset } = useSendTransaction()
   const { address } = useAccount()
+
+  const handleTestTx = () => {
+    if (!address) return
+    // Auto-reset after 25s to prevent infinite spinner
+    setTimeout(() => reset(), 25000)
+    sendTransaction({
+      to: '0x0000000000000000000000000000000000000001',
+      value: 1n,
+    })
+  }
 
   const hasCatastrophicError = isClient && blocksError && statsError && !blocks
 
@@ -549,25 +559,28 @@ export default function DashboardPage() {
             )}
 
             <button
-              onClick={() =>
-                sendTransaction({
-                  to: '0x0000000000000000000000000000000000000001',
-                  value: 1n,
-                  gas: 21000n,
-                })
-              }
+              onClick={handleTestTx}
               disabled={txPending || !address}
               className="rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {txPending ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Sending...
+                  Waiting for confirmation...
                 </span>
               ) : (
                 'Test Transaction'
               )}
             </button>
+
+            {txPending && (
+              <button
+                onClick={() => reset()}
+                className="ml-3 rounded-lg border border-zinc-700 px-3 py-2.5 text-xs text-zinc-400 hover:text-zinc-200 transition-colors font-mono"
+              >
+                Cancel
+              </button>
+            )}
 
             {txData && (
               <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
