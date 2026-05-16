@@ -6,7 +6,6 @@ import { motion, useSpring, useMotionValue } from 'framer-motion'
 import Navigation from '@/components/Navigation'
 import WalletTracker from '@/components/WalletTracker'
 import NetworkUnavailable from '@/components/NetworkUnavailable'
-import { useSendTransaction, useAccount } from 'wagmi'
 import { useLatestBlocks, useNetworkStats } from '@/hooks/useLatestBlocks'
 import { computeParallelScore } from '@/lib/parallelScore'
 
@@ -175,17 +174,20 @@ export default function DashboardPage() {
 
   const cx = 150, cy = 150, r = 110
 
-  const { sendTransaction, data: txData, isPending: txPending, error: txError, reset } = useSendTransaction()
-  const { address } = useAccount()
+  const [mockTxHash, setMockTxHash] = useState<string | null>(null)
+  const [mockTxPending, setMockTxPending] = useState(false)
 
-  const handleTestTx = () => {
-    if (!address) return
-    // Auto-reset after 25s to prevent infinite spinner
-    setTimeout(() => reset(), 25000)
-    sendTransaction({
-      to: '0x0000000000000000000000000000000000000001',
-      value: 1n,
-    })
+  const handleMockTestTx = () => {
+    setMockTxPending(true)
+    setMockTxHash(null)
+    // Simulate 2s tx confirmation
+    setTimeout(() => {
+      const randomHash = '0x' + Array.from({ length: 64 }, () =>
+        Math.floor(Math.random() * 16).toString(16)
+      ).join('')
+      setMockTxHash(randomHash)
+      setMockTxPending(false)
+    }, 2000)
   }
 
   const hasCatastrophicError = isClient && blocksError && statsError && !blocks
@@ -545,60 +547,50 @@ export default function DashboardPage() {
 
           <WalletTracker />
 
-          <div className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6">
-            <h2 className="text-lg font-semibold text-zinc-100 mb-2">Test Your Contract</h2>
+          <div className="mt-8 border border-zinc-800 bg-[#18181b]/50 p-6">
+            <h2 className="text-lg font-semibold text-zinc-100 mb-2">Demo Transaction</h2>
             <p className="text-sm text-zinc-400 mb-4">
-              Send a real transaction on Monad testnet to see it appear in the Explorer.
-              Connect your wallet first, then click below.
+              Simulate a transaction to demonstrate how ParaLens visualizes block data.
+              No wallet required — this is for demo purposes.
             </p>
 
-            {!address && (
-              <p className="text-sm text-yellow-400 mb-4 font-mono">
-                Connect your wallet first using the button in the top-right.
-              </p>
-            )}
-
             <button
-              onClick={handleTestTx}
-              disabled={txPending || !address}
-              className="rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              onClick={handleMockTestTx}
+              disabled={mockTxPending}
+              className="bg-orange-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {txPending ? (
+              {mockTxPending ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Waiting for confirmation...
+                  Simulating...
                 </span>
               ) : (
-                'Test Transaction'
+                'Simulate Transaction'
               )}
             </button>
 
-            {txPending && (
+            {mockTxPending && (
               <button
-                onClick={() => reset()}
-                className="ml-3 rounded-lg border border-zinc-700 px-3 py-2.5 text-xs text-zinc-400 hover:text-zinc-200 transition-colors font-mono"
+                onClick={() => setMockTxPending(false)}
+                className="ml-3 border border-zinc-700 px-3 py-2.5 text-xs text-zinc-400 hover:text-zinc-200 transition-colors font-mono"
               >
                 Cancel
               </button>
             )}
 
-            {txData && (
-              <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
-                <div className="text-xs text-zinc-500 mb-1">Transaction Hash</div>
+            {mockTxHash && (
+              <div className="mt-4 border border-zinc-800 bg-zinc-950/50 p-4">
+                <div className="text-xs text-zinc-500 mb-1">Simulated Transaction Hash</div>
                 <a
-                  href={`https://testnet.monadscan.com/tx/${txData}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={`/explorer/${mockTxHash}`}
                   className="font-mono text-sm text-orange-400 hover:text-orange-300 break-all transition-colors"
                 >
-                  {txData}
+                  {mockTxHash}
                 </a>
-              </div>
-            )}
-
-            {txError && (
-              <div className="mt-4 rounded-xl border border-red-900/50 bg-red-950/20 p-4">
-                <div className="text-sm text-red-400">{txError.message}</div>
+                <p className="text-[10px] text-zinc-600 mt-2 font-mono">
+                  This is a simulated hash for demo purposes. Real transactions
+                  require a wallet connected to Monad testnet.
+                </p>
               </div>
             )}
           </div>
