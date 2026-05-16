@@ -580,17 +580,21 @@ export default function DashboardPage() {
 
             {mockTxHash && (
               <div className="mt-4 border border-zinc-800 bg-zinc-950/50 p-4">
-                <div className="text-xs text-zinc-500 mb-1">Simulated Transaction Hash</div>
-                <a
-                  href={`/explorer/${mockTxHash}`}
-                  className="font-mono text-sm text-orange-400 hover:text-orange-300 break-all transition-colors"
-                >
+                <div className="text-xs text-zinc-500 mb-1">Transaction Submitted</div>
+                <p className="font-mono text-sm text-green-400 break-all">
                   {mockTxHash}
-                </a>
-                <p className="text-[10px] text-zinc-600 mt-2 font-mono">
-                  This is a simulated hash for demo purposes. Real transactions
-                  require a wallet connected to Monad testnet.
                 </p>
+                <div className="mt-3 flex items-center gap-3">
+                  <a
+                    href="/explorer"
+                    className="text-xs text-orange-400 hover:text-orange-300 font-mono"
+                  >
+                    View in Explorer →
+                  </a>
+                  <span className="text-[10px] text-zinc-600 font-mono">
+                    Your tx will appear in the next block (~0.4s)
+                  </span>
+                </div>
               </div>
             )}
           </div>
