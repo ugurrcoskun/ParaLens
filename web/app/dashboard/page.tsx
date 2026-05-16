@@ -6,7 +6,7 @@ import { motion, useSpring, useMotionValue } from 'framer-motion'
 import Navigation from '@/components/Navigation'
 import WalletTracker from '@/components/WalletTracker'
 import NetworkUnavailable from '@/components/NetworkUnavailable'
-import { useSendTransaction } from 'wagmi'
+import { useSendTransaction, useAccount } from 'wagmi'
 import { useLatestBlocks, useNetworkStats } from '@/hooks/useLatestBlocks'
 import { computeParallelScore } from '@/lib/parallelScore'
 
@@ -176,6 +176,7 @@ export default function DashboardPage() {
   const cx = 150, cy = 150, r = 110
 
   const { sendTransaction, data: txData, isPending: txPending, error: txError } = useSendTransaction()
+  const { address } = useAccount()
 
   const hasCatastrophicError = isClient && blocksError && statsError && !blocks
 
@@ -537,19 +538,24 @@ export default function DashboardPage() {
           <div className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6">
             <h2 className="text-lg font-semibold text-zinc-100 mb-2">Test Your Contract</h2>
             <p className="text-sm text-zinc-400 mb-4">
-              Send a test transaction to see how ParaLens tracks your transaction's parallel
-              execution performance. After sending, your tx will appear in recent blocks on the
-              Explorer.
+              Send a real transaction on Monad testnet to see it appear in the Explorer.
+              Connect your wallet first, then click below.
             </p>
+
+            {!address && (
+              <p className="text-sm text-yellow-400 mb-4 font-mono">
+                Connect your wallet first using the button in the top-right.
+              </p>
+            )}
 
             <button
               onClick={() =>
                 sendTransaction({
-                  to: '0x0000000000000000000000000000000000000000',
+                  to: address!,
                   value: 0n,
                 })
               }
-              disabled={txPending}
+              disabled={txPending || !address}
               className="rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {txPending ? (
