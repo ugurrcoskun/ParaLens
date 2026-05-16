@@ -13,6 +13,9 @@ import NetworkUnavailable from '@/components/NetworkUnavailable'
 
 export default function ExplorerPage() {
   const [isClient, setIsClient] = useState(false)
+  const [search, setSearch] = useState('')
+  const [tab, setTab] = useState<'live' | 'top'>('live')
+  const router = useRouter()
   useEffect(() => { setIsClient(true) }, [])
 
   const { data: blocks, isLoading, error, refetch } = useLatestBlocks(20, {
@@ -23,9 +26,6 @@ export default function ExplorerPage() {
   const { data: allBlocks } = useLatestBlocks(120, {
     enabled: isClient && tab === 'top',
   })
-  const [search, setSearch] = useState('')
-  const [tab, setTab] = useState<'live' | 'top'>('live')
-  const router = useRouter()
 
   const handleSearch = useCallback(
     (e: React.FormEvent) => {
