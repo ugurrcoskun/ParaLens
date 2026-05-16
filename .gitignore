@@ -1,0 +1,22 @@
+node_modules/
+.next/
+out/
+dist/
+.env
+.env.local
+.cache/
+*.log
+.DS_Store
+contracts/out/
+contracts/cache/
+contracts/lib/
+web/node_modules/
+web/.next/
+web/.env.local
+# Excluded from GitHub (local dev files)
+.agents/
+/docs/
+skills/
+frontend-skills.md
+skill-lock.json
+skills-lock.json
