@@ -551,8 +551,9 @@ export default function DashboardPage() {
             <button
               onClick={() =>
                 sendTransaction({
-                  to: address!,
-                  value: 0n,
+                  to: '0x0000000000000000000000000000000000000001',
+                  value: 1n,
+                  gas: 21000n,
                 })
               }
               disabled={txPending || !address}
